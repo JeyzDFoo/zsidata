@@ -11,6 +11,7 @@ class NoiseApp extends StatefulWidget {
 
 class _NoiseAppState extends State<NoiseApp> {
   //variable declarations
+  Timer? timer;
   bool _isRecording = false; //controls state of app
   StreamSubscription<NoiseReading>? _noiseSubscription; //required stream of noise information
   late NoiseMeter _noiseMeter;
@@ -58,12 +59,13 @@ class _NoiseAppState extends State<NoiseApp> {
   }
 
   void average() {
-    while(_isRecording = true){
-      Future.delayed(Duration(seconds: 3), (){
-        print('Future Test');
-      });
-    }
+    print('called');
+    timer = Timer.periodic(Duration(seconds: 3), (timer){
+      print('timer complete');
+    });
+
   }
+
 
   void onError(Object e) {
     print(e.toString());
@@ -71,7 +73,7 @@ class _NoiseAppState extends State<NoiseApp> {
   }
 
   void start() async {
-   // average();
+    average();
     previousMillis = DateTime.now().millisecondsSinceEpoch;
     try {
       _noiseSubscription = _noiseMeter.noiseStream.listen(onData);
@@ -85,6 +87,7 @@ class _NoiseAppState extends State<NoiseApp> {
     try {
       _noiseSubscription!.cancel();
       _noiseSubscription = null;
+      timer?.cancel();
 
       setState(() => _isRecording = false);
     } catch (e) {
