@@ -18,6 +18,7 @@ class NoiseApp extends StatefulWidget {
 
 class _NoiseAppState extends State<NoiseApp> {
   //variable declarations
+  final _offsetController = TextEditingController();
   double  averageDB = 0;
   Timer? timer; //used to adjust averaging time
   bool _isRecording = false; //controls state of app
@@ -148,7 +149,30 @@ class _NoiseAppState extends State<NoiseApp> {
       body: Container(
         child: Column(
           children: [
-            Text('Offset:'),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text('dB Offset:  '),
+                SizedBox(
+                  width: 50,
+                  child: TextField(
+                    decoration: InputDecoration(
+                      border: OutlineInputBorder(),
+                      hintText: '20',
+                    ),
+                    controller: _offsetController,
+                    keyboardType: TextInputType.number,
+                    inputFormatters: <TextInputFormatter>[
+                      FilteringTextInputFormatter.digitsOnly
+                    ],
+                    onSubmitted: (value){
+                      offset = double.parse(value).toInt();
+                    },
+                  ),
+                ),
+              ],
+            ),
+
             Expanded(
               flex: 2,
               child: Center(
