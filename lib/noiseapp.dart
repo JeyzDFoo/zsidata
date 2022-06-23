@@ -4,6 +4,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'meter.dart';
 
+//TODO:
+//add offset value to calibrate dB
+//make average dB selectable
+
+//this value is added to the reading for calibration
+var offset = 20;
+
 class NoiseApp extends StatefulWidget {
   @override
   _NoiseAppState createState() => _NoiseAppState();
@@ -11,14 +18,15 @@ class NoiseApp extends StatefulWidget {
 
 class _NoiseAppState extends State<NoiseApp> {
   //variable declarations
-  Timer? timer;
+  double  averageDB = 0;
+  Timer? timer; //used to adjust averaging time
   bool _isRecording = false; //controls state of app
   StreamSubscription<NoiseReading>? _noiseSubscription; //required stream of noise information
   late NoiseMeter _noiseMeter;
-  double? maxDB;
-  double? meanDB;
-  List<_ChartData> chartData = <_ChartData>[];
-  List<_RecordData> recordData = <_RecordData>[];
+  double? maxDB; //from meter.dart
+  double? meanDB; //from meter.dart, not used for the average.
+  List<_ChartData> chartData = <_ChartData>[]; //chart data not used
+  var recordData = []; //Used with timer for averaging
   // ChartSeriesController? _chartSeriesController;
   late int previousMillis;
 
@@ -37,33 +45,25 @@ class _NoiseAppState extends State<NoiseApp> {
     meanDB = noiseReading.meanDecibel;
 
     //capture data for chart
-    chartData.add(
-      _ChartData(
-        maxDB,
-        meanDB,
-        ((DateTime.now().millisecondsSinceEpoch - previousMillis) / 1000)
-            .toDouble(),
-      ),
-    );
+    // chartData.add(
+    //   _ChartData(
+    //     maxDB,
+    //     meanDB,
+    //     ((DateTime.now().millisecondsSinceEpoch - previousMillis) / 1000)
+    //         .toDouble(),
+    //   ),
+    // );
 
-    //capture data to use for averaging a location
-    recordData.add(
-      _RecordData(
-        maxDB,
-        meanDB,
-        ((DateTime.now().millisecondsSinceEpoch - previousMillis) / 1000)
-            .toDouble(),
-      ),
-    );
+    //capture data to use for averaging
+    recordData.add(meanDB);
 
   }
 
   void average() {
-    print('called');
-    timer = Timer.periodic(Duration(seconds: 3), (timer){
-      print('timer complete');
+    timer = Timer.periodic(Duration(seconds: 1), (timer){
+      averageDB = recordData.reduce((a, b) => a+b) / recordData.length;
+      recordData = [];
     });
-
   }
 
 
@@ -73,7 +73,7 @@ class _NoiseAppState extends State<NoiseApp> {
   }
 
   void start() async {
-    average();
+   average();
     previousMillis = DateTime.now().millisecondsSinceEpoch;
     try {
       _noiseSubscription = _noiseMeter.noiseStream.listen(onData);
@@ -128,14 +128,14 @@ class _NoiseAppState extends State<NoiseApp> {
 
   @override
   Widget build(BuildContext context) {
-    bool _isDark = Theme.of(context).brightness == Brightness.light;
     if (chartData.length >= 25) {
       chartData.removeAt(0);
     }
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: _isDark ? Colors.green : Colors.green.shade800,
+
         title: const Text('Sound Pressure (dB)'),
+        backgroundColor: Colors.black54,
       ),
 
       floatingActionButton: FloatingActionButton.extended(
@@ -148,26 +148,30 @@ class _NoiseAppState extends State<NoiseApp> {
       body: Container(
         child: Column(
           children: [
-            Text('Average:'),
-            Text('Test value'),
+            Text('Offset:'),
             Expanded(
               flex: 2,
               child: Center(
                 child: Text(
-                  maxDB != null ? maxDB!.toStringAsFixed(2) : 'Press start',
+                  meanDB != null ? meanDB!.toStringAsFixed(2)+" dB" : 'ZeroSound App',
                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 36),
                 ),
               ),
             ),
             Text(
               meanDB != null
-                  ? 'Mean: ${meanDB!.toStringAsFixed(2)}'
-                  : 'Awaiting data',
-              style: const TextStyle(fontWeight: FontWeight.w300, fontSize: 14),
+                  ? 'Average/Second:'
+                  : 'Press Start',
+              style: const TextStyle(fontWeight: FontWeight.normal, fontSize: 28),
+            ),
+            Text(
+              meanDB != null
+                  ? '${averageDB.toStringAsFixed(1)}' + 'dB'
+                  : '0.0',
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 28),
             ),
             const Expanded(
-              child: Text('Test')
-
+              child: Text('')
               // SfCartesianChart(
               //   series: <LineSeries<_ChartData, double>>[
               //     LineSeries<_ChartData, double>(
@@ -197,12 +201,4 @@ class _ChartData {
   final double frames;
 
   _ChartData(this.maxDB, this.meanDB, this.frames);
-}
-
-class _RecordData {
-  final double? maxDB;
-  final double? meanDB;
-  final double frames;
-
-  _RecordData(this.maxDB, this.meanDB, this.frames);
 }

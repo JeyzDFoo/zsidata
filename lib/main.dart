@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:zerosound/noiseapp.dart';
 
@@ -29,6 +31,11 @@ class _MyAppState extends State<MyApp> {
     return MaterialApp(
       // debugShowCheckedModeBanner: false,
       title: 'ZeroSound',
+      theme: ThemeData(
+        brightness: Brightness.light,
+        primaryColor: Colors.black54,
+        fontFamily: 'Georgia',
+      ),
       home: NoiseApp(),
     );
   }

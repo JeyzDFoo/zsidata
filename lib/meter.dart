@@ -4,6 +4,7 @@ import 'dart:core';
 import 'dart:math';
 import 'package:audio_streamer/audio_streamer.dart';
 import 'package:flutter/services.dart';
+import 'noiseapp.dart';
 
 /// Holds a decibel value for a noise level reading.
 class NoiseReading {
@@ -21,8 +22,8 @@ class NoiseReading {
     // max amplitude is 2^15
     double maxAmp = pow(2, 15) + 0.0;
 
-    _maxDecibel = 20 * log(maxAmp * max) * log10e;
-    _meanDecibel = 20 * log(maxAmp * mean) * log10e;
+    _maxDecibel = 20 * log(maxAmp * max) * log10e + offset;
+    _meanDecibel = 20 * log(maxAmp * mean) * log10e + offset;
   }
 
   /// Maximum measured decibel reading.
