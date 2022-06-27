@@ -4,7 +4,7 @@ import 'dart:core';
 import 'dart:math';
 import 'package:audio_streamer/audio_streamer.dart';
 import 'package:flutter/services.dart';
-import 'noiseapp.dart';
+import 'package:zerosound/dB/realtiledb.dart';
 
 /// Holds a decibel value for a noise level reading.
 class NoiseReading {

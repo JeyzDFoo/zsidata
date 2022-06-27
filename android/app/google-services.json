@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "784211973969",
+    "project_id": "internal-e47a1",
+    "storage_bucket": "internal-e47a1.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:784211973969:android:7aed66de77f03801b6a570",
+        "android_client_info": {
+          "package_name": "com.example.zerosound"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "784211973969-17qk024i9j2orr63lks99i64cpm5gqfq.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB_I9OvTDnzcKz2NcpduTYiMJw4jggGY24"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "784211973969-17qk024i9j2orr63lks99i64cpm5gqfq.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

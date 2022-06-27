@@ -1,7 +1,10 @@
-import 'dart:ui';
 
 import 'package:flutter/material.dart';
-import 'package:zerosound/noiseapp.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+
+import 'homepage.dart';
+import 'login.dart';
 
 //git add .
 //git commit -m "notes"
@@ -16,9 +19,15 @@ import 'package:zerosound/noiseapp.dart';
 // flutter build web
 //firebase deploy
 
+Future main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
+  runApp(MyApp());
+
+}
 
 
-void main() => runApp(MyApp());
+//void main() => runApp(MyApp());
 
 class MyApp extends StatefulWidget {
   @override
@@ -36,7 +45,26 @@ class _MyAppState extends State<MyApp> {
         primaryColor: Colors.black54,
         fontFamily: 'Georgia',
       ),
-      home: NoiseApp(),
+      home: MainPage(),//NoiseApp(),
+    );
+  }
+}
+
+class MainPage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: StreamBuilder<User?>(
+        stream: FirebaseAuth.instance.authStateChanges(),
+        builder: (context, snapshot){
+          if (snapshot.hasData){
+            return HomePage();
+          } else {
+            return LoginWidget();
+          }
+
+        },
+      ),
     );
   }
 }
