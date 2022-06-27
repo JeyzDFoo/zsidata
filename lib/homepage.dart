@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:zerosound/dB/realtiledb.dart';
 
+import 'dB/multipointdb.dart';
+
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -19,7 +21,7 @@ class _HomePageState extends State<HomePage> {
       body: Column(
         children: [
           TextButton(
-            child: Text('dB Meter'),
+            child: Text('Realtime dB Meter'),
             onPressed: (){
               Navigator.push<void>(
                 context,
@@ -35,7 +37,7 @@ class _HomePageState extends State<HomePage> {
               Navigator.push<void>(
                 context,
                 MaterialPageRoute<void>(
-                  builder: (BuildContext context) => NoiseApp(),
+                  builder: (BuildContext context) => MultiDB(),
                 ),
               );
             },
