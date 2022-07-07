@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:zerosound/dB/realtiledb.dart';
+import 'package:zerosound/main.dart';
 
 import 'dB/multipointdb.dart';
+
+import 'audioplayer/player.dart';
 
 
 class HomePage extends StatefulWidget {
@@ -38,6 +41,17 @@ class _HomePageState extends State<HomePage> {
                 context,
                 MaterialPageRoute<void>(
                   builder: (BuildContext context) => MultiDB(),
+                ),
+              );
+            },
+          ),
+          TextButton(
+            child: Text('Audio Player'),
+            onPressed: (){
+              Navigator.push<void>(
+                context,
+                MaterialPageRoute<void>(
+                  builder: (BuildContext context) => Playback(),
                 ),
               );
             },

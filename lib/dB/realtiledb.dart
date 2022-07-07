@@ -9,7 +9,7 @@ import 'meter.dart';
 //make average dB selectable
 
 //this value is added to the reading for calibration
-var offset = 20;
+var offset = 16; //16 for Jeremy's A13
 
 class NoiseApp extends StatefulWidget {
   @override

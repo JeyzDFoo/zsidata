@@ -10,8 +10,6 @@ import 'package:firebase_core/firebase_core.dart';
 
 //TODO:
 //this value is added to the reading for calibration
-var offset = 20;
-
 
 class MultiDB extends StatefulWidget {
   @override
@@ -121,23 +119,7 @@ class _MultiDBState extends State<MultiDB> {
                       : '0.0',
                   style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 28),
                 ),
-                SizedBox(
-                  width: 50,
-                  child: TextField(
-                    decoration: InputDecoration(
-                      border: OutlineInputBorder(),
-                      hintText: '20',
-                    ),
-                    controller: _offsetController,
-                    keyboardType: TextInputType.number,
-                    inputFormatters: <TextInputFormatter>[
-                      FilteringTextInputFormatter.digitsOnly
-                    ],
-                    onSubmitted: (value){
-                      offset = double.parse(value).toInt();
-                    },
-                  ),
-                ),
+
                 IconButton(
                     icon: _isRecording ? Icon(Icons.stop) : Icon(Icons.play_arrow),
                     onPressed: _isRecording ? stop : start,

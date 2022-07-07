@@ -2,7 +2,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-
 import 'homepage.dart';
 import 'login.dart';
 
@@ -19,22 +18,21 @@ import 'login.dart';
 // flutter build web
 //firebase deploy
 
+
 Future main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-  runApp(MyApp());
+  runApp(SoundApp());
 
 }
 
 
-//void main() => runApp(MyApp());
-
-class MyApp extends StatefulWidget {
+class SoundApp extends StatefulWidget {
   @override
-  _MyAppState createState() => _MyAppState();
+  _SoundAppState createState() => _SoundAppState();
 }
 
-class _MyAppState extends State<MyApp> {
+class _SoundAppState extends State<SoundApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
