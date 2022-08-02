@@ -18,6 +18,17 @@ import 'login.dart';
 // flutter build web
 //firebase deploy
 
+var quietmic_lat;
+var quietmic_long;
+var noiseymic_lat;
+var noiseymic_long;
+var panel_lat;
+var panel_long;
+var noisesource_lat;
+var noisesource_long;
+
+var offset = 16; //16 for Jeremy's A13
+
 
 Future main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -43,7 +54,7 @@ class _SoundAppState extends State<SoundApp> {
         primaryColor: Colors.black54,
         fontFamily: 'Georgia',
       ),
-      home: MainPage(),//NoiseApp(),
+      home: MainPage(),
     );
   }
 }

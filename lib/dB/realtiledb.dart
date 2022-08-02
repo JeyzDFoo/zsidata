@@ -2,6 +2,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:zerosound/main.dart';
 import 'meter.dart';
 
 //TODO:
@@ -9,7 +10,6 @@ import 'meter.dart';
 //make average dB selectable
 
 //this value is added to the reading for calibration
-var offset = 16; //16 for Jeremy's A13
 
 class NoiseApp extends StatefulWidget {
   @override
@@ -152,7 +152,7 @@ class _NoiseAppState extends State<NoiseApp> {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text('dB Offset:  '),
+                Text('dB Offset: ' ),
                 SizedBox(
                   width: 50,
                   child: TextField(

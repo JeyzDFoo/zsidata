@@ -39,6 +39,7 @@ dependencies:
   firebase_auth: ^3.3.20
   cloud_firestore: ^3.1.18
   audioplayers: ^0.20.1
+  location: ^4.4.0
 
 dev_dependencies:
   flutter_test:
@@ -75,7 +76,8 @@ flutter:
     - assets/audio/
   #   - images/a_dot_burr.jpeg
   #   - images/a_dot_ham.jpeg
-    - assets/logo/
+    - assets/logo/zsi.png
+    - assets/logo/test.jpg
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.

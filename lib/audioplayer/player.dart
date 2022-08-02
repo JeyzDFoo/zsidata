@@ -17,13 +17,13 @@ class _PlaybackState extends State<Playback> {
   Duration position = Duration.zero;
 
   @override
-  void initState(){
+  void initState() {
     super.initState();
 
     setAudio();
 
     //Listen to states: playing, paused, stopped
-    audioPlayer.onPlayerStateChanged.listen((state){
+    audioPlayer.onPlayerStateChanged.listen((state) {
       setState(() {
         isPlaying = state == PlayerState.PLAYING;
       });
@@ -32,7 +32,7 @@ class _PlaybackState extends State<Playback> {
     //Listen to audio duration changes
     audioPlayer.onDurationChanged.listen((newDuration) {
       setState(() {
-      duration = newDuration;
+        duration = newDuration;
       });
     });
 
@@ -42,7 +42,6 @@ class _PlaybackState extends State<Playback> {
         position = newPosition;
       });
     });
-
   }
 
   Future setAudio() async {
@@ -54,8 +53,6 @@ class _PlaybackState extends State<Playback> {
     audioPlayer.setUrl(url.path, isLocal: true);
   }
 
-
-
   @override
   void dispose() {
     audioPlayer.dispose();
@@ -65,9 +62,18 @@ class _PlaybackState extends State<Playback> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(
+        title: Text('Anti-Siren Demo'),
+      ),
       body: Column(
-        children:[
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(22.0),
+            child: Image(
+              image: NetworkImage(
+                  'https://zerosound.com/assets/images/zerosound-logo.png'),
+            ),
+          ),
           Slider(
             min: 0,
             max: duration.inSeconds.toDouble(),
@@ -75,19 +81,21 @@ class _PlaybackState extends State<Playback> {
             onChanged: (value) async {
               final position = Duration(seconds: value.toInt());
               await audioPlayer.seek(position);
-
               await audioPlayer.resume();
             },
           ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(position.inSeconds.toString()),
-              Text(duration.inSeconds.toString()),
-            ],
+          Padding(
+            padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(position.inSeconds.toString()),
+                Text(duration.inSeconds.toString()),
+              ],
+            ),
           ),
           CircleAvatar(
-            radius: 35,
+            radius: 34,
             child: IconButton(
                 icon: Icon(
                   isPlaying ? Icons.pause : Icons.play_arrow,
