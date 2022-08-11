@@ -41,6 +41,13 @@ class _MultiDBState extends State<MultiDB> {
   var currentLocation; //current location of device, updated every second
   String readingtype = 'unknown'; //ambient, suppression on, suppression off
 
+  //These variables are used for the 3 second trailing timer used for capturing data points
+  Timer trailingTimer = Timer(Duration(seconds: 0), (){} );
+  double? trailingAverageDB;
+  var trailingRecordData = [];
+
+  var recordButtonColor = Colors.green;
+
 
 @override
 
@@ -55,7 +62,9 @@ class _MultiDBState extends State<MultiDB> {
     //check the status of location services
     if (!_serviceEnabled){
       _serviceEnabled = await location.requestService();
+      location.changeSettings(accuracy: LocationAccuracy.high);
       if (!_serviceEnabled){
+        location.changeSettings(accuracy: LocationAccuracy.high);
         return;
       }
     }
@@ -63,11 +72,14 @@ class _MultiDBState extends State<MultiDB> {
     var _permissionGranted = await location.hasPermission();
     if (_permissionGranted == PermissionStatus.denied){
       _permissionGranted = await location.requestPermission();
+      location.changeSettings(accuracy: LocationAccuracy.high);
 
       if (_permissionGranted != PermissionStatus.granted) {
+        location.changeSettings(accuracy: LocationAccuracy.high);
         return;
       }
     }
+
 
     var myLocation = await location.getLocation();
 
@@ -87,10 +99,11 @@ class _MultiDBState extends State<MultiDB> {
     meanDB = noiseReading.meanDecibel;
     //capture data to use for averaging
     recordData.add(meanDB);
+    trailingRecordData.add(meanDB);
   }
 
   void average() {
-    timer = Timer.periodic(Duration(seconds: 1), (timer){
+      timer = Timer.periodic(Duration(seconds: 1), (timer){
       averageDB = recordData.reduce((a, b) => a+b) / recordData.length;
       recordData = [];
       getLocation();
@@ -118,6 +131,7 @@ class _MultiDBState extends State<MultiDB> {
       _noiseSubscription!.cancel();
       _noiseSubscription = null;
       timer?.cancel();
+      trailingTimer.cancel();
 
       setState(() => _isRecording = false);
     } catch (e) {
@@ -130,14 +144,17 @@ class _MultiDBState extends State<MultiDB> {
   @override
   Widget build(BuildContext context) {
 
-
-
-
     return Scaffold(
       appBar: AppBar(
 
         title: const Text('Sound Pressure (dB)'),
-        backgroundColor: Colors.black54,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: (){
+            stop(); //stop the recording so it's not running in the background
+            Navigator.pop(context);
+          },
+        ),
       ),
 
       body: Container(
@@ -146,8 +163,9 @@ class _MultiDBState extends State<MultiDB> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  meanDB != null ? meanDB!.toStringAsFixed(2)+" dB" : 'ZeroSound App',
+               Text(
+                // currentLocation.accuracy == null ? 'GPS Accuracy' : currentLocation.accuracy!.toStringAsFixed(2)+" m" ,
+                 'Bug!',
                   style: TextStyle(fontWeight: FontWeight.normal, fontSize: 12),
                 ),
                 Text(
@@ -259,21 +277,38 @@ class _MultiDBState extends State<MultiDB> {
                     }
                 ),
                 TextButton(
-                    child: Text('Add'),
-                    onPressed: (){
-                      Readings.add(
-                          Reading(
-                              readingNumber: iteration,
-                              db: averageDB,
-                              lat: currentLocation.latitude,
-                              long: currentLocation.longitude,
-                              accuracy: currentLocation.accuracy,
-                              time: DateTime.now(),
-                              readingtype: readingtype,
-                          )
-                      );
-                      iteration = iteration + 1;
-                      setState(() {});
+                    child: Text('Add', style: TextStyle(color: Colors.white)),
+                    style: ButtonStyle(
+                        backgroundColor:  MaterialStateProperty.all(recordButtonColor)
+                    ),
+                    onPressed: () async{
+                      if (trailingTimer.isActive == false){
+                        setState(() {
+                          recordButtonColor = Colors.red;
+                        });
+                        trailingRecordData = []; //clear exisiting data
+                        //Timer is used to take the average over a given duration
+                        trailingTimer = await Timer(Duration(seconds: 3), (){
+                          trailingAverageDB = recordData.reduce((a, b) => a+b) / recordData.length;
+                          Readings.add(
+                              Reading(
+                                readingNumber: iteration,
+                                db: averageDB,
+                                lat: currentLocation.latitude,
+                                long: currentLocation.longitude,
+                                accuracy: currentLocation.accuracy,
+                                time: DateTime.now(),
+                                readingtype: readingtype,
+                              )
+                          );
+                          iteration = iteration + 1;
+                          setState(() {
+                            recordButtonColor = Colors.green;
+                          });
+                        });
+                      }
+
+
                     }
                 ),
 
@@ -453,3 +488,4 @@ class Reading {
 
 
 }
+

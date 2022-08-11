@@ -27,7 +27,7 @@ var panel_long;
 var noisesource_lat;
 var noisesource_long;
 
-var offset = 16; //16 for Jeremy's A13
+var offset = 0; //16 for Jeremy's A13
 
 
 Future main() async {

@@ -1,5 +1,7 @@
 
 import 'dart:async';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:zerosound/main.dart';
@@ -44,16 +46,6 @@ class _NoiseAppState extends State<NoiseApp> {
     });
     maxDB = noiseReading.maxDecibel;
     meanDB = noiseReading.meanDecibel;
-
-    //capture data for chart
-    // chartData.add(
-    //   _ChartData(
-    //     maxDB,
-    //     meanDB,
-    //     ((DateTime.now().millisecondsSinceEpoch - previousMillis) / 1000)
-    //         .toDouble(),
-    //   ),
-    // );
 
     //capture data to use for averaging
     recordData.add(meanDB);
@@ -132,11 +124,33 @@ class _NoiseAppState extends State<NoiseApp> {
     if (chartData.length >= 25) {
       chartData.removeAt(0);
     }
+    CollectionReference offsets = FirebaseFirestore.instance.collection('offsets');
+    final FirebaseAuth auth = FirebaseAuth.instance;
+
+    Future<void> addOffset() {
+      // Call the user's CollectionReference to update the offset
+      return offsets
+      .doc(auth.currentUser!.email)
+          .set({
+        'offset': offset, // db offset
+
+      })
+          .then((value) => print("Offset Updated"))
+          .catchError((error) => print("Failed to update offset: $error"));
+    }
+
+
     return Scaffold(
       appBar: AppBar(
 
-        title: const Text('Sound Pressure (dB)'),
-        backgroundColor: Colors.black54,
+        title: const Text('Sound Meter Calibration'),
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: (){
+            stop(); //stop the recording so it's not running in the background
+            Navigator.pop(context);
+          },
+        ),
       ),
 
       floatingActionButton: FloatingActionButton.extended(
@@ -149,39 +163,38 @@ class _NoiseAppState extends State<NoiseApp> {
       body: Container(
         child: Column(
           children: [
+            SizedBox(height: 20),
+            Text('Increase/Decrease the offset until the reading'),
+            Text('matches a dB meter.'),
+            SizedBox(
+              height: 50,
+            ),
+            Text('Be sure to STOP and SAVE!'),
+            SizedBox(height: 25),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text('dB Offset: ' ),
-                SizedBox(
-                  width: 50,
-                  child: TextField(
-                    decoration: InputDecoration(
-                      border: OutlineInputBorder(),
-                      hintText: '20',
-                    ),
-                    controller: _offsetController,
-                    keyboardType: TextInputType.number,
-                    inputFormatters: <TextInputFormatter>[
-                      FilteringTextInputFormatter.digitsOnly
-                    ],
-                    onSubmitted: (value){
-                      offset = double.parse(value).toInt();
-                    },
-                  ),
+                IconButton(
+                  icon: Icon(Icons.remove),
+                  onPressed: (){
+                    setState(() {
+                      offset = offset - 1;
+                    });
+                  },
+                ),
+                Text('dB Offset: ' + offset.toString()),
+                IconButton(
+                  icon: Icon(Icons.add),
+                  onPressed: (){
+                    setState(() {
+                      offset = offset + 1;
+                    });
+                  },
                 ),
               ],
             ),
 
-            Expanded(
-              flex: 2,
-              child: Center(
-                child: Text(
-                  meanDB != null ? meanDB!.toStringAsFixed(2)+" dB" : 'ZeroSound App',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 36),
-                ),
-              ),
-            ),
+
             Text(
               meanDB != null
                   ? 'Average/Second:'
@@ -194,24 +207,12 @@ class _NoiseAppState extends State<NoiseApp> {
                   : '0.0',
               style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 28),
             ),
-            const Expanded(
-              child: Text('')
-              // SfCartesianChart(
-              //   series: <LineSeries<_ChartData, double>>[
-              //     LineSeries<_ChartData, double>(
-              //         dataSource: chartData,
-              //         xAxisName: 'Time',
-              //         yAxisName: 'dB',
-              //         name: 'dB values over time',
-              //         xValueMapper: (_ChartData value, _) => value.frames,
-              //         yValueMapper: (_ChartData value, _) => value.maxDB,
-              //         animationDuration: 0),
-              //   ],
-              // ),
+            SizedBox(height: 20,),
+            TextButton(
+              child: Text('Save Offset'),
+              onPressed: addOffset,
             ),
-            const SizedBox(
-              height: 68,
-            ),
+
           ],
         ),
       ),
@@ -226,3 +227,5 @@ class _ChartData {
 
   _ChartData(this.maxDB, this.meanDB, this.frames);
 }
+
+
